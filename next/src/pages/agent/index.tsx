@@ -35,6 +35,7 @@ const AgentPage: NextPage = () => {
   });
 
   const messages = getAgent.data ? (getAgent.data.tasks as Message[]) : [];
+  console.log(messages)
 
   const shareLink = () => {
     return encodeURI(`${env.NEXT_PUBLIC_VERCEL_URL}${router.asPath}`);
