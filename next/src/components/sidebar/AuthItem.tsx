@@ -46,10 +46,10 @@ const AuthItem: FC<{
 
         <span className="sr-only">Your profile</span>
         <div>
-          <p aria-hidden="true">{user?.name}</p>
-          <p aria-hidden="true" className="text-xs font-thin">
-            {user?.email}
-          </p>
+          <p aria-hidden="true">{user?.name.slice(0,4)}....{user?.name.slice(-3)}</p>
+          {/*<p aria-hidden="true" className="text-xs font-thin">*/}
+          {/*  {user?.email}*/}
+          {/*</p>*/}
         </div>
         {user && <FaEllipsisH className="ml-auto">Test</FaEllipsisH>}
 

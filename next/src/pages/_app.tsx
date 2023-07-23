@@ -8,6 +8,24 @@ import { appWithTranslation, useTranslation } from "next-i18next";
 import { useEffect } from "react";
 import nextI18NextConfig from "../../next-i18next.config.js";
 import { GoogleAnalytics } from "nextjs-google-analytics";
+import { WagmiConfig, createConfig } from "wagmi";
+import { ConnectKitProvider, ConnectKitButton, getDefaultConfig } from "connectkit";
+
+const config = createConfig(
+  getDefaultConfig({
+    // Required API Keys
+    alchemyId: "nvBa2jeuuTZRBLUuaoSmimtTv0zAV_wR", // or infuraId
+    walletConnectProjectId:"d411e18013ef9f79a941af8af6390309",
+
+    // Required
+    appName: "SomethingGPT",
+
+    // Optional
+    appDescription: "Your App Description",
+    appUrl: "https://family.co", // your app's url
+    appIcon: "https://family.co/logo.png", // your app's icon, no bigger than 1024x1024px (max. 1MB)
+  }),
+);
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -26,7 +44,11 @@ const MyApp: AppType<{ session: Session | null }> = ({
     <SessionProvider session={session}>
       <GoogleAnalytics trackPageViews />
       <Analytics />
+      <WagmiConfig config={config}>
+        <ConnectKitProvider>
       <Component {...pageProps} />
+        </ConnectKitProvider>
+      </WagmiConfig>
     </SessionProvider>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import clsx from "clsx";
 import type { GetServerSidePropsContext } from "next";
 import Head from "next/head";
@@ -15,9 +15,23 @@ import type { LiteralUnion } from "next-auth/react/types";
 import type { BuiltInProviderType } from "next-auth/providers";
 import Input from "../ui/input";
 
+import {ConnectKitButton} from "connectkit";
+import {useAccount} from "wagmi";
+
+
 const SignIn = ({ providers }: { providers: Provider }) => {
   const { data: session } = useSession();
   const { push } = useRouter();
+
+  const { address, isConnecting, isDisconnected, isConnected } = useAccount();
+
+  useEffect(() => {
+    console.log("isConnected", isConnected)
+    console.log("address", address)
+    if (isConnected) {
+      signIn("credentials", { callbackUrl: "/", name: address }).catch(console.error);
+    }
+  } , [isConnected])
 
   if (session) push("/").catch(console.error);
 
@@ -56,10 +70,11 @@ const SignIn = ({ providers }: { providers: Provider }) => {
             </div>
           </FadeIn>
           <FadeIn duration={1.5} delay={0.4} initialY={50}>
-            {providers.credentials && <InsecureSignin />}
-            {details.map((detail) => (
-              <ProviderSignInButton key={detail.id} detail={detail} />
-            ))}
+            <InsecureSignin />
+            {/*{providers.credentials && <InsecureSignin />}*/}
+            {/*{details.map((detail) => (*/}
+            {/*  <ProviderSignInButton key={detail.id} detail={detail} />*/}
+            {/*))}*/}
           </FadeIn>
         </div>
       </div>
@@ -71,27 +86,28 @@ const InsecureSignin = () => {
   const [usernameValue, setUsernameValue] = useState("");
   return (
     <div>
-      <Input
-        value={usernameValue}
-        onChange={(e) => setUsernameValue(e.target.value)}
-        placeholder="Enter Username"
-        type="text"
-        name="Username Field"
-      />
-      <button
-        onClick={() => {
-          if (!usernameValue) return;
+        <ConnectKitButton/>
+      {/*<Input*/}
+      {/*  value={usernameValue}*/}
+      {/*  onChange={(e) => setUsernameValue(e.target.value)}*/}
+      {/*  placeholder="Enter Username"*/}
+      {/*  type="text"*/}
+      {/*  name="Username Field"*/}
+      {/*/>*/}
+      {/*<button*/}
+      {/*  onClick={() => {*/}
+      {/*    if (!usernameValue) return;*/}
 
-          signIn("credentials", { callbackUrl: "/", name: usernameValue }).catch(console.error);
-        }}
-        className={clsx(
-          "mb-4 mt-4 flex items-center rounded-md bg-white px-10 py-3 text-sm font-semibold text-black sm:text-base",
-          "transition-colors duration-300 hover:bg-gray-200",
-          !usernameValue && "cursor-not-allowed"
-        )}
-      >
-        Sign in with username (Insecure)
-      </button>
+      {/*    signIn("credentials", { callbackUrl: "/", name: usernameValue }).catch(console.error);*/}
+      {/*  }}*/}
+      {/*  className={clsx(*/}
+      {/*    "mb-4 mt-4 flex items-center rounded-md bg-white px-10 py-3 text-sm font-semibold text-black sm:text-base",*/}
+      {/*    "transition-colors duration-300 hover:bg-gray-200",*/}
+      {/*    !usernameValue && "cursor-not-allowed"*/}
+      {/*  )}*/}
+      {/*>*/}
+      {/*  Sign in with username (Insecure)*/}
+      {/*</button>*/}
     </div>
   );
 };

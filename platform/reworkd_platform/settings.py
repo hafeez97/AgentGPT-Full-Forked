@@ -65,8 +65,8 @@ class Settings(BaseSettings):
     serp_api_key: Optional[str] = None
 
     # Frontend URL for CORS
-    frontend_url: str = "http://localhost:3000"
-    allowed_origins_regex: Optional[str] = None
+    frontend_url: str = "http://39.144.189.166:3000"
+    allowed_origins_regex: Optional[str] = ".*"
 
     # Variables for the database
     db_host: str = "localhost"
