@@ -4,7 +4,7 @@ import Combo from "../ui/combox";
 import Input from "../ui/input";
 import type { Language } from "../utils/languages";
 import { languages } from "../utils/languages";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import nextI18NextConfig from "../../next-i18next.config.js";
@@ -64,6 +64,11 @@ const SettingsPage = () => {
     updateSettings("customModelName", model.name as GPTModelNames);
   };
 
+  useEffect(() => {
+    console.log(settings);
+    
+  }, [settings]);
+
   return (
     <DashboardLayout>
       <div className="grid min-h-screen flex-grow place-items-center p-2 sm:p-10 lg:p-16">
@@ -83,7 +88,7 @@ const SettingsPage = () => {
                 items={languages}
                 icon={<FaGlobe />}
               />
-              <Input
+              {/* <Input
                 label="API Key"
                 name="api-key"
                 placeholder="sk..."
@@ -118,7 +123,7 @@ const SettingsPage = () => {
                     {isApiKeyValid === false && <FaExclamationCircle />}
                   </Button>
                 }
-              />
+              /> */}
             </div>
 
             {!disableAdvancedSettings && (
@@ -158,14 +163,15 @@ const SettingsPage = () => {
                     onChange={(e) => updateSettings("customMaxLoops", parseFloat(e.target.value))}
                     attributes={{
                       min: 1,
-                      max: 25,
+                      max: 100,
                       step: 1,
                     }}
                     helpText={t("CONTROL_THE_MAXIMUM_NUM_OF_LOOPS")}
                     icon={<FaSyncAlt />}
                     disabled={disableAdvancedSettings}
+                    // disabled
                   />
-                  <Input
+                  {/* <Input
                     label={t("TOKENS")}
                     value={settings.maxTokens}
                     name="tokens"
@@ -179,7 +185,7 @@ const SettingsPage = () => {
                     helpText={t("CONTROL_MAXIMUM_OF_TOKENS_DESCRIPTION")}
                     icon={<FaCoins />}
                     disabled={disableAdvancedSettings}
-                  />
+                  /> */}
                 </div>
               </div>
             )}

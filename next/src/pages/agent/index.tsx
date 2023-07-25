@@ -1,7 +1,7 @@
 import type { GetStaticProps } from "next";
 import { type NextPage } from "next";
 import Button from "../../components/Button";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { api } from "../../utils/api";
 import ChatWindow from "../../components/console/ChatWindow";
@@ -35,7 +35,12 @@ const AgentPage: NextPage = () => {
   });
 
   const messages = getAgent.data ? (getAgent.data.tasks as Message[]) : [];
-  console.log(messages)
+
+  // useEffect(() => {
+  //  console.log(getAgent);
+   
+  // }, [messages]);
+
 
   const shareLink = () => {
     return encodeURI(`${env.NEXT_PUBLIC_VERCEL_URL}${router.asPath}`);

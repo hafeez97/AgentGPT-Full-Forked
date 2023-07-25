@@ -19,7 +19,9 @@ class AutonomousAgent {
   session?: Session;
   messageService: MessageService;
   api: AgentApi;
-
+  
+  
+  private completedTasks: number;
   private readonly workLog: AgentWork[];
   private lastConclusion?: () => Promise<void>;
 
@@ -28,7 +30,8 @@ class AutonomousAgent {
     messageService: MessageService,
     modelSettings: ModelSettings,
     api: AgentApi,
-    session?: Session
+    session?: Session,
+
   ) {
     this.model = model;
     this.messageService = messageService;
@@ -36,10 +39,22 @@ class AutonomousAgent {
     this.session = session;
     this.api = api;
     this.workLog = [new StartGoalWork(this)];
+    this.completedTasks = 0
   }
+
+  
+
 
   async run() {
     this.model.setLifecycle("running");
+
+
+    // Log data from the agent store
+    console.log("Agent Store Data:", useAgentStore.getState());
+
+    const agent = useAgentStore.getState();
+    console.log(agent.agent.modelSettings.customMaxLoops);
+    
 
     // If an agent is paused during execution, we need to play work conclusions
     if (this.lastConclusion) {
@@ -63,6 +78,27 @@ class AutonomousAgent {
       } else {
         await work.conclude();
       }
+      if( work.task !== undefined){
+        console.log(work.task.status);
+        console.log(work.task);
+        if(work.task.status === "completed" && work.task.result !== "")
+        {
+          // this.completedTasks += 1;
+          this.completedTasks++;
+        }
+        
+      }
+      
+      console.log(this.completedTasks);
+      
+      
+      // Increment the completedTasks counter and check if it has reached the maximum
+      if (this.completedTasks >= agent.agent.modelSettings.customMaxLoops*2) {
+        this.model.setLifecycle("stopped");
+      }
+      
+
+      
 
       // Add next thing if available
       const next = work.next();
@@ -109,13 +145,19 @@ class AutonomousAgent {
         return shouldRetry;
       }
     );
+
+
     useAgentStore.getState().setIsAgentThinking(false);
+
+
   }
+
+  
 
   addTasksIfWorklogEmpty = () => {
     if (this.workLog.length > 0) return;
 
-    // No work items, check if we still have tasks
+    
     const currentTask = this.model.getCurrentTask();
     if (currentTask) {
       this.workLog.push(new AnalyzeTaskWork(this, currentTask));

@@ -41,6 +41,9 @@ import AgentControls from "../components/console/AgentControls";
 import { ChatMessage } from "../components/console/ChatMessage";
 import clsx from "clsx";
 import TaskSidebar from "../components/drawer/TaskSidebar";
+import { useBalance, useAccount } from 'wagmi'
+import { DEFAULT_MAX_LOOPS_FREE } from "../utils/constants";
+
 
 const Home: NextPage = () => {
   const { t } = useTranslation("indexPage");
@@ -61,11 +64,42 @@ const Home: NextPage = () => {
   const goalInput = useAgentInputStore.use.goalInput();
   const setGoalInput = useAgentInputStore.use.setGoalInput();
   const [chatInput, setChatInput] = React.useState("");
-  const { settings } = useSettings();
+  const { settings, updateSettings } = useSettings();
 
   const [showSignInDialog, setShowSignInDialog] = React.useState(false);
   const [showToolsDialog, setShowToolsDialog] = React.useState(false);
   const agentUtils = useAgent();
+
+  
+  const { address, isDisconnected } = useAccount();
+
+
+  const { data, isError, isLoading } = useBalance({
+    address: address,
+  })
+
+
+
+  useEffect(() => {
+    if (data) {
+      console.log(data.formatted);
+      const balance = parseInt(data.formatted);
+
+      // const isThinking = useAgentStore.use.isAgentThinking();
+        
+      switch (true) {
+        case balance === 0:
+          updateSettings("customMaxLoops", 5);
+          console.log("set to 5 loops");
+          break;
+        case balance > 0:
+          updateSettings("customMaxLoops", 50);
+          console.log("set to 50 loops");
+          break;
+      }
+    }
+  }, [data]);
+  
 
   const nameInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -189,7 +223,8 @@ const Home: NextPage = () => {
           <Expand className="flex w-full flex-grow overflow-hidden">
             <ChatWindow
               messages={messages}
-              title={<ChatWindowTitle model={settings.customModelName} />}
+              // title={<ChatWindowTitle model={settings.customModelName} />}
+              title={"Max Tasks: "+ settings.customMaxLoops}
               chatControls={
                 agent
                   ? {
